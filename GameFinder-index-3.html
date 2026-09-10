@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GameFinder</title>
+<style>
+body{margin:0;background:#101322;color:#fff;font-family:Tahoma,Arial;padding:20px}
+main{max-width:900px;margin:auto} header{text-align:center;padding:25px;background:#1b2140;border-radius:18px}
+h1{font-size:34px}.search{display:flex;gap:10px;margin:20px 0}
+input,select,button{padding:13px;border-radius:10px;border:1px solid #39415f;font:inherit}
+input,select{background:#1b2035;color:white;flex:1}button{background:#665cff;color:white}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.filters button{background:#242b45}
+.filters .on{background:#665cff}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.card{background:#191e32;border:1px solid #303854;border-radius:16px;padding:16px}.tag{display:inline-block;background:#29314d;padding:5px 8px;border-radius:15px;margin:3px;font-size:12px}
+section{margin-top:25px;background:#191e32;padding:18px;border-radius:16px}.form{display:grid;gap:10px}
+@media(max-width:600px){.search{flex-direction:column}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>🎮 GameFinder</h1><p>بازی مورد علاقت رو سریع پیدا کن!</p></header>
+
+<div class="search">
+<input id="q" placeholder="نام بازی را جستجو کن..." oninput="show()">
+<select id="platform" onchange="show()"><option>همه</option><option>Android</option><option>PC</option><option>PlayStation</option><option>Xbox</option></select>
+</div>
+
+<div class="filters">
+<button class="on" onclick="filter(this,'همه')">همه</button>
+<button onclick="filter(this,'ماجراجویی')">ماجراجویی</button>
+<button onclick="filter(this,'زامبی')">زامبی</button>
+<button onclick="filter(this,'اکشن')">اکشن</button>
+<button onclick="filter(this,'ترسناک')">ترسناک</button>
+<button onclick="filter(this,'آفلاین')">آفلاین</button>
+<button onclick="filter(this,'آنلاین')">آنلاین</button>
+</div>
+
+<div id="games" class="grid"></div>
+
+<section>
+<h2>➕ معرفی یک بازی</h2>
+<div class="form">
+<input id="name" placeholder="نام بازی">
+<input id="cat" placeholder="دسته‌بندی">
+<select id="plat"><option>Android</option><option>PC</option><option>PlayStation</option><option>Xbox</option></select>
+<select id="mode"><option>آفلاین</option><option>آنلاین</option></select>
+<input id="desc" placeholder="توضیح کوتاه">
+<button onclick="add()">افزودن بازی</button>
+</div>
+</section>
+</main>
+
+<script>
+const base=[
+['Into the Dead 2','زامبی','Android','آفلاین','بقا در دنیای زامبی‌ها'],
+['Cover Fire','اکشن','Android','آفلاین','تیراندازی سه‌بعدی'],
+['The Walking Zombie 2','زامبی','Android','آفلاین','ماجراجویی و بقا'],
+['Minecraft','ماجراجویی','Android','آفلاین','ساخت و اکتشاف'],
+['Dead Trigger 2','زامبی','Android','آنلاین','اکشن اول‌شخص'],
+['Among Us','اکشن','Android','آنلاین','بازی گروهی'],
+['Granny','ترسناک','Android','آفلاین','حل معما و فرار'],
+['The Forest','ترسناک','PC','آفلاین','بقا و اکتشاف']
+];
+let extra=JSON.parse(localStorage.getItem('gf')||'[]'), current='همه';
+function all(){return base.concat(extra)}
+function filter(b,c){current=c;document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('on'));b.classList.add('on');show()}
+function show(){
+let q=document.getElementById('q').value.toLowerCase(),p=document.getElementById('platform').value;
+let a=all().filter(g=>(!q||g.join(' ').toLowerCase().includes(q))&&(p==='همه'||g[2]===p)&&(current==='همه'||g[1]===current||g[3]===current));
+document.getElementById('games').innerHTML=a.length?a.map(g=>'<article class="card"><h3>'+g[0]+'</h3><span class="tag">'+g[1]+'</span><span class="tag">'+g[2]+'</span><span class="tag">'+g[3]+'</span><p>'+g[4]+'</p></article>').join(''):'<p>بازی‌ای پیدا نشد.</p>'
+}
+function add(){
+let n=document.getElementById('name').value.trim();if(!n)return alert('نام بازی را وارد کن');
+extra.push([n,document.getElementById('cat').value||'متفرقه',document.getElementById('plat').value,document.getElementById('mode').value,document.getElementById('desc').value||'بازی معرفی‌شده توسط کاربر.']);
+localStorage.setItem('gf',JSON.stringify(extra));show();
+}
+show();
+</script>
+</body>
+</html>
